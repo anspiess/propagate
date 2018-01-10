@@ -1,0 +1,29 @@
+[
+    {
+        "definitions" : [
+        ],
+        "file" : "C:/temp/propagate/src/CcolVarsC.cpp",
+        "file_last_write" : 1510501254
+    },
+    {
+        "definitions" : [
+        ],
+        "file" : "C:/temp/propagate/src/CrowVarsC.cpp",
+        "file_last_write" : 1510501077
+    },
+    {
+        "definitions" : [
+            {
+                "column" : 6,
+                "file" : "C:/temp/propagate/src/registerDynamicSymbol.c",
+                "kind" : 6,
+                "line" : 20,
+                "name" : "R_init_propagate(DllInfo *)",
+                "parent_name" : "",
+                "usr" : "c:@F@R_init_propagate"
+            }
+        ],
+        "file" : "C:/temp/propagate/src/registerDynamicSymbol.c",
+        "file_last_write" : 1507969016
+    }
+]

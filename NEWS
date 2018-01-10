@@ -1,0 +1,54 @@
+propagate 1.0-6 (07-01-2018)
+* Doc to 'print.propagate' has been removed (too trivial...)
+* 'plot.propagate' has been changed to only display a histogram with confidence interval, median and mean; the former boxplot was not very expedient.
+* added the following four distributions for 'fitDistr' and as random samplers: Burr, Chi, Inverse Chi-square and Cosine.
+* 'fitDistr' has been seriously revamped: 
+  1) Distribution selection is now based on BIC (not AIC), as my simulations revealed a more robust performance.
+  2) We now have 32(!) distributions.
+  3) All distributions are now fitted with a brute force approach so that the parameter space is exploited more efficiently.
+  4) The best fit is now explicitly named by a new 'print.fitDistr' function (requested by Hugo Mildenberger).
+  5) All density functions are now exported to be used elsewhere (requested by Hugo Mildenberger).
+  6) The fit quality can now be inspected with a QQ-Plot that compares the empirical data with the fitted distribution (requested by Hugo Mildenberger).
+  7) All outputs are now sorted ascendingly by BIC.
+  8) The parameter estimates are now supplemented by their standard errors.
+  9) The distributions can now be selected by "distsel", e.g. c(1:10, 12, 15) (requested by Hugo Mildenberger).
+  10) The BIC sorted output data frame now includes residual sum-of-squares (RSS) and mean squared error (MSE).
+
+propagate 1.0-5 (24-10-2017)
+Changes and bug-fixes in functions:
+* 'bigcor' can now calculate correlations between a large maxtrix x and a smaller matrix/vector y similar to 'cor(x = mat1, y = mat2)', as requested by P. Waldmann.
+* added literature references to the 'interval' doc.
+* the objective function in 'fitDistr' now returns sqrt(weights) * residuals instead of weights * residual^2, which was not quite correct...
+* added the following new continuous distributions to 'fitDistr' and as random number generators: Inverse Gaussian, Generalized Extreme Value, Inverse Gamma, Rayleigh; and 2-parameter beta, Chi-square, exponential and F-distribution for fitting.
+* 'mixCov' has been simplified to handle covariance matrices and vectors containing variances.
+* 'WelchSatter' now uses optional external sensitivities, which can be transferred from 'propagate'.
+* 'contributions' was removed, and the "sensitivities"/"relative contributions" calculation incorporated into 'WelchSatter', which is then given in the output of 'summary.propagate'. 
+* 'propagate' has been revamped and simplified. Distinction between statistical summary and raw data is now done automatically; Monte Carlo simulation is now based solely on the t-distribution with degree of freedom obtained from Welch-Satterthwaite approximation. If degrees of freedom are not supplied, the normal distribution will be used.
+* added a new function 'stochContr' that conducts "stochastic contribution analysis" by calculating the change in propagated uncertainty when each of the simulated distributions is kept constant at its mean.
+
+propagate 1.0-4 (25-09-2014)
+New functions:
+* added a summary function for propagate objects that includes skewness/kurtosis and Shapiro-Wilks/Kolmogorov-Smirnov tests for normality on the MC evaluations.
+* added 'interval' function for uncertainty propagation based on interval arithmetics. Avoids the so-called "dependency problem" by evaluating all combinations of a sequence grid.
+
+Changes and bug-fixes in functions:
+* "use.eval" has been removed from 'propagate' because switching between evaluation in an environment or row-wise is now done automatically.
+* "method" has been removed from 'propagate' because the function will now first try symbolic differentiation and automatically switch to numeric differentiaion if that fails.
+* 'propagate' can now handle functions in addition to expressions. This way, one can define functions for more complicated setups, such as recurrence relations. However, Taylor expansion is not applicable in these scenarios because no automatic differentiation is possible, so only Monte Carlo simulation will be conducted.
+* fixed a bug in 'predictNLS' which gave an error when the formula for 'nls' is defined outside of 'nls' and supplied as a variable to the function call (thanks to Bartosz Kostrzewa).
+* print.propagate is now less verbose, because summary.propagate has been added.
+* added an example in doc to 'propagate' from the Python library 'soerp' (https://pypi.python.org/pypi/soerp) for comparison purposes => exactly (to the fifth decimal) the same results. 
+
+propagate 1.0-3 (28-02-2014)
+* As the new parametrization of 'dgnorm' tended to give convergence problems (bug kindly provided by Tony C), it was included into those distributions that are initially fitted by a grid of possible starting parameters in 'fitDistr'. 
+* The 'optim' function of 'fitDistr' was replaced by 'nls.lm' of the "minpack" package because it is more robust in terms of minimizing residal sum-of-squares.
+* Updated 'Examples' section of 'bigcor'.
+
+propagate 1.0-2 (27-01-2014)
+* Modified 'rmises', 'rctrap' and 'rgtrap' so that a result vector is preallocated, which makes the three functions a bit faster, roughly 300000-400000 random numbers/second (3 GHz Pentium Dual Core). 
+* 'colVars' and 'rowVars' are now coded in C++ using the Rcpp framework. For a row-wise calculation of variances from a matrix of 500000 rows/10 columns this takes now only 100 ms! 
+* Added function 'bigcor' for creating VERY large correlation/covariance matrices, using a step-wise submatrix filling approach (Huh?). There is a corresponding blog entry to be found under http://rmazing.wordpress.com/2013/02/22/bigcor-large-correlation-matrices-in-r/.
+* Generalized normal distribution 'dgnorm' now has a different parametrization that tallies with 'rgnorm' (bug kindly provided by Tony C).
+
+propagate 1.0-1 (29-08-2013)
+* First version and hence no update.

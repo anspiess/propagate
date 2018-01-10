@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "set.seed(123)\nX <- cbind(rt(200000, 5), rt(200000, 12))\nSigma <- matrix(c(1, 0.5, 0.5, 2), nrow = 2)\ncov(X)\nL <- chol(Sigma)\nX2 <- X %*% L\ncov(X2)\ncor(X2)\n\n\n",
+    "created" : 1515526036794.000,
+    "dirty" : true,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "3113142088",
+    "id" : "EFEDAB6B",
+    "lastKnownWriteTime" : 8533514390746440307,
+    "last_content_update" : 1515562599968,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled3"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

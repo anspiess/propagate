@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(Rcpp)\n\nmu <- c(10, 5, 2)\nnu <- c(30, 10, 20)\nSigma <- diag(3)\nP <- list(t(c(0, 0)), t(c(0, 0)), t(c(0, 0)))\nsd <- list(t(1), t(1), t(1))\nMAT1 <- matrix(1:6, ncol = 2)\nMAT2 <- matrix(1:6, ncol = 3)\n\n\ncppFunction(\n'\nNumericMatrix matmult(\nNumericMatrix &mat1,\nNumericMatrix  &mat2\n)\n{\n  int nc1 = mat1.ncol();\n  int nc2 = mat2.ncol();\n  int nr1 = mat1.nrow();\n  int nr2 = mat2.nrow();\n  NumericMatrix resmat(nr1, nc2);\n  NumericVector rm1, cm2;\n\n  for (int i = 0; i < nr1; i++) {\n    rm1 = mat1(i,_);\n    for (int j = 0; j < nc2; j++) {\n      cm2 = mat2(_,j);\n      resmat(i,j) = std::inner_product(rm1.begin(), rm1.end(), cm2.begin(), 0.);\n    }\n  }\n  return(resmat);\n}\n'\n)\n\nmatmult(MAT1, MAT2)\n\n\n\ncppFunction(\n'\nNumericMatrix RcppMvt(\nNumericVector mu,\nNumericMatrix sigma,\nNumericVector nu,\nNumericVector x,\nint n,\nList P,\nList sd\n)\n{\n  for (int j = 0; j < 1; j++) {\n    for (int i = 0; i < mu.size(); i++) {\n      NumericVector mu2 = mu.erase(NumericVector i);\n      Rcout << mu2 << std::endl;\n    NumericMatrix P_i = P[i]; \n    Rcout << P_i << std::endl;\n    }\n  }\n  \n  \n  Rcout << \"Some message\" << std::endl;\n  return(sigma);\n\n}\n'\n)\n\nRcppMvt(mu, Sigma, nu, 10, 100000, P, sd)",
+    "created" : 1514722016075.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2509384303",
+    "id" : "93C61F44",
+    "lastKnownWriteTime" : 1510551210,
+    "last_content_update" : 1510551210,
+    "path" : "C:/temp/mvtvnuCpp-R.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

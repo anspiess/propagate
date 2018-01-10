@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "mvtvnu <- function (\n  n, \n  mean = rep(0, nrow(sigma)), \n  sigma = diag(length(mean)),\n  nu = rep(10, length(mean)),\n  cut = FALSE\n)\n{\n  ## input checks\n  if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps), check.attributes = FALSE)) stop(\"'sigma' must be a symmetric matrix\")\n  if (length(nu) == 1) nu <- rep(nu, length(mean))\n  if (!all.equal(length(mean), length(nu), length(diag(sigma)))) stop(\"'mu', 'nu' and 'sigma' need to be of same dimension!\")\n  eS <- eigen(sigma, symmetric = FALSE)\n  ev <- eS$values\n  if (!all(ev >= -1E-6 * abs(ev[1L]))) stop(\"'sigma' is not positive definite\")\n  \n  d <- length(mean)\n  S <- 1000\n  if (d == 1) {X <- rtnorm.gibbs(n, mu = mean[1], sigma = sigma[1, 1], a = lower[1], b = upper[1])\n    return(X)\n  }\n  X <- matrix(NA, n, d)\n  U <- runif((S + n) * d)\n  l <- 1\n  sd <- list(d)\n  P <- list(d)\n  for (i in 1:d) {\n    Sigma <- sigma[-i, -i]\n    sigma_ii <- sigma[i, i]\n    Sigma_i <- sigma[i, -i]\n    P[[i]] <- t(Sigma_i) %*% solve(Sigma)\n    sd[[i]] <- sqrt(sigma_ii - P[[i]] %*% Sigma_i)\n  }\n  x <- rep(0, d)\n \n  for (j in (1 - S):n) {\n    for (i in 1:d) {\n      mu_i <- mean[i] + P[[i]] %*% (x[-i] - mean[-i])\n      F.tmp <- pt(c(-Inf, Inf), nu[i])\n      Fa <- F.tmp[1]\n      Fb <- F.tmp[2]\n      x[i] <- mu_i + sd[[i]] * qt(U[l] * (Fb - Fa) + Fa, nu[i])\n      l <- l + 1\n    }\n    X[j, ] <- x\n  }    \n  \n  if (cut) {\n    CUT <- apply(X, 2, function(x) quantile(x, c(0.001, 0.999), na.rm = TRUE))\n    for (i in 1:ncol(X)) {\n      SEL <- which(X[, i] < CUT[1, i] | X[, i] > CUT[2, i])\n      X[SEL, i] <- NA\n      X <- na.omit(X)\n    }\n  }\n  \n \n  \n  return(X)\n}\n\n################################\nSigma <- diag(4); Sigma[1, 2] <- Sigma[2, 1] <- 0.5\nmu <- c(10, 2, 20, 5)\nnu <- c(5, 10, 15, 20)\nres <- mvtvnu(n = 1000000, mean = mu, sigma = Sigma, nu = nu, cut = F)\nplot(res[, 1:2], pch = 16, cex = 0.5, asp = 1)\ncov(res)\ncor(res)\nfor (i in 1:ncol(res)) print(MASS:::fitdistr(res[, i], \"t\"))\nlibrary(rgl)\n#plot3d(res[, 1:3])\n\nSigma <- diag(4)\nSigma <- diag(1/(nu/(nu-2)))\nSigma[1, 2] <- Sigma[2, 1] <- 0.5\nmu <- c(10, 2, 20, 5)\nnu <- c(20, 5, 10, 3)\nnu <- c(200, 500, 100, 300)\n\n\nDAT <- sapply(1:4, function(x) rt(100000, nu[x]))\n\nSigma <- diag(c(0.5, 2, 1, 5))\nd <- diag(Sigma)\nDAT <- sapply(1:4, function(x) rt(100000, nu[x]) * sqrt(d[x] * (nu[x] - 2)/nu[x]) + mu[x])\nSigma2 <- Sigma; Sigma2[1, 2] <- Sigma2[2, 1] <- 0.5\n#diag(Sigma2) <- 1\nDAT <- DAT %*% chol(Sigma2)\n\n\nDAT <- sweep(DAT, 2, mu, \"+\")\nplot(DAT[, 1:2], pch = 16, cex = 0.5, asp = 1)\ncov(DAT)\nfor (i in 1:ncol(DAT)) print(MASS:::fitdistr(DAT[, i], \"t\"))\nlibrary(rgl)\nplot3d(DAT[, 1:3])\n\n\n",
+    "created" : 1514722009159.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "731223610",
+    "id" : "B8830C35",
+    "lastKnownWriteTime" : 1511726105,
+    "last_content_update" : 1511726105,
+    "path" : "C:/temp/mvtvnu.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
