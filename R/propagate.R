@@ -5,7 +5,7 @@ second.order = TRUE,
 do.sim = TRUE, 
 cov = TRUE, 
 df = NULL,
-nsim = 100000,
+nsim = 1000000,
 alpha = 0.05,
 ...
 )
@@ -30,10 +30,11 @@ alpha = 0.05,
   ## check for matching variable names
   if (!isFun) VARS <- all.vars(expr)  
   m <- match(VARS, colnames(data))
+  
   if (any(is.na(m))) stop("propagate: variable names of input dataframe and expression do not match!")
   if (length(unique(m)) != length(m)) stop("propagate: some variable names are repetitive!")
   
-  DATA <- as.matrix(data)
+  DATA <- data
   EXPR <- expr
   
   ## create variables from input data
@@ -57,10 +58,10 @@ alpha = 0.05,
   } 
   
   ## raw data: if no covariance matrix is supplied, create one with off-diagonals or not
-  if (cov & isRaw) {
+  if (is.logical(cov) & isTRUE(cov) & isRaw) {
     SIGMA <- cov(data)   
   } 
-  if (!cov & isRaw) {
+  if (is.logical(cov) & isFALSE(cov) & isRaw) {
     SIGMA <- cov(data) 
     SIGMA[upper.tri(SIGMA)] <- SIGMA[lower.tri(SIGMA)] <- 0 
   } 
@@ -112,7 +113,7 @@ alpha = 0.05,
     message("propagate: there was an error in calculating the first-order variance")
     VAR1 <- NA
   }
- 
+  
   ## second-order mean: firstMEAN + 0.5 * tr(H.S) 
   if (second.order) {
     HESS <- try(makeHess(EXPR, m2), silent = TRUE)
@@ -163,8 +164,8 @@ alpha = 0.05,
   ################## Monte-Carlo simulation using multivariate t-distribution #####################
   if (do.sim) {  
     if (is.na(ws$ws.df) | is.infinite(ws$ws.df)) DF <- 1E6 else DF <- ws$ws.df
-    if (is.numeric(df)) DF <- 1E6
-    
+    if (is.numeric(df)) DF <- df 
+
     ## if raw data, don't create Monte Carlo data
     if (!isRaw) {
       datSIM <- rtmvt(nsim, mean = meanVAL, sigma = SIGMA, df = floor(DF)) 

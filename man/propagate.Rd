@@ -10,7 +10,7 @@ A general function for the calculation of uncertainty propagation by first-/seco
 
 \usage{
 propagate(expr, data, second.order = TRUE, do.sim = TRUE, cov = TRUE, 
-          df = NULL, nsim = 100000, alpha = 0.05, ...)  
+          df = NULL, nsim = 1000000, alpha = 0.05, ...)  
 }
 
 \arguments{
@@ -28,29 +28,29 @@ propagate(expr, data, second.order = TRUE, do.sim = TRUE, cov = TRUE,
 \details{
 The implemented methods are:\cr\cr
 1) \bold{Monte Carlo simulation:}\cr
-For each variable \eqn{\boldsymbol{m}} in \code{data}, simulated data \eqn{\boldsymbol{x = [X_1, X_2, \ldots, X_n]}} with \eqn{\boldsymbol{n}} = \code{nsim} samples is generated from a multivariate t-distribution \eqn{\boldsymbol{x_{m, n} \sim t(\mu, \Sigma, \nu)}} using means \eqn{\boldsymbol{\mu_i}} and covariance matrix \eqn{\boldsymbol{\Sigma}} constructed from the standard deviations \eqn{\boldsymbol{\sigma_i}} of each variable. All data is coerced into a new dataframe that has the same covariance structure as the initial \code{data}: \eqn{\boldsymbol{\Sigma(\mathtt{data}) = \Sigma(x_{m, n})}}. Each row \eqn{\boldsymbol{i = 1, \ldots, n}} of the simulated dataset \eqn{\boldsymbol{x_{m, n}}} is evaluated with \code{expr}, \eqn{\boldsymbol{y_i = f(x_{m, i})}}, and summary statistics (mean, sd, median, mad, quantile-based confidence interval based on [\eqn{\frac{\alpha}{2}, 1-\frac{\alpha}{2}}]) are calculated on \eqn{\boldsymbol{y}}. 
+For each variable \eqn{m} in \code{data}, simulated data \eqn{X = [x_1, x_2, \ldots, x_n]} with \eqn{n} = \code{nsim} samples is generated from a multivariate t-distribution \eqn{X_{m, n} \sim t(\mu, \Sigma, \nu)} using means \eqn{\mu_i} and covariance matrix \eqn{\boldsymbol{\Sigma}} constructed from the standard deviations \eqn{\sigma_i} of each variable. All data is coerced into a new dataframe that has the same covariance structure as the initial \code{data}: \eqn{\boldsymbol{\Sigma}(\mathtt{data}) = \boldsymbol{\Sigma}(X_{m, n})}. Each row \eqn{i = 1, \ldots, n} of the simulated dataset \eqn{X_{m, n}} is evaluated with \code{expr}, \eqn{y_i = f(x_{m, i})}, and summary statistics (mean, sd, median, mad, quantile-based confidence interval based on [\eqn{\frac{\alpha}{2}, 1-\frac{\alpha}{2}}]) are calculated on \eqn{y}. 
 
 2) \bold{Error propagation:}\cr
 The propagated error is calculated by first-/second-order Taylor expansion accounting for full covariance structure using matrix algebra.\cr
 The following transformations based on two variables \eqn{x_1, x_2} illustrate the equivalence of the matrix-based approach with well-known classical notations:\cr
 \bold{First-order mean:} \eqn{\rm{E[y]} = f(\bar{x}_i)}\cr
-\bold{First-order variance:} \eqn{\sigma_y^2 = { \color{red} \nabla_x\mathbf{C}_x\nabla_x^T}}:\cr
+\bold{First-order variance:} \eqn{\sigma_y^2 = {\color{red} \nabla \mathbf{\Sigma} \nabla^T}}:\cr
 \deqn{{ \color{red}[\rm{j_1}\; \rm{j_2}] \left[ \begin{array}{cc} \sigma_1^2 & \sigma_1\sigma_2 \\ \sigma_2\sigma_1 & \sigma_2^2 \end{array} \right] \left[ \begin{array}{c} \rm{j_1} \\ \rm{j_2} \end{array} \right]} = \rm{j_1}^2 \sigma_1^2 + \rm{2 j_1 j_2} \sigma_1 \sigma_2 + \rm{j_2}^2 \sigma_2^2}
 \deqn{= \underbrace{\sum_{i=1}^2 \rm{j_i}^2 \sigma_i^2 + 2\sum_{i=1\atop i \neq k}^2\sum_{k=1\atop k \neq i}^2 \rm{j_i j_k} \sigma_{ik}}_{\rm{classical\;notation}} = \frac{1}{1!} \left(\sum_{i=1}^2 \frac{\partial f}{\partial x_i} \sigma_i \right)^2}
 \cr
-\bold{Second-order mean:} \eqn{\rm{E}[y] = f(\bar{x}_i) + {\color{blue} \frac{1}{2}\rm{tr}(\mathbf{H}_{xx}\mathbf{C}_x)}}:\cr
+\bold{Second-order mean:} \eqn{\rm{E}[y] = f(\bar{x}_i) + {\color{blue} \frac{1}{2}\rm{tr}(\mathbf{H\Sigma)}}}:\cr
 \deqn{{ \color{blue} \frac{1}{2} \rm{tr} \left[ \begin{array}{cc} \rm{h_1} & \rm{h_2} \\ \rm{h_3} & \rm{h_4} \end{array} \right] \left[ \begin{array}{cc} \sigma_1^2 & \sigma_1\sigma_2 \\ \sigma_2\sigma_1 & \sigma_2^2 \end{array} \right]} = \frac{1}{2} \rm{tr} \left[ \begin{array}{cc} \rm{h_1} \sigma_1^2 + \rm{h_2}\sigma_1\sigma_2 & \rm{h_1}\sigma_1\sigma_2 + \rm{h_2}\sigma_2^2 \\ \rm{h_3} \sigma_1^2 + \rm{h_4} \sigma_1\sigma_2 & \rm{h_3} \sigma_1\sigma_2 + \rm{h_4} \sigma_2^2 \end{array} \right]}
 \deqn{ = \frac{1}{2}(\rm{h_1}\sigma_1^2 + \rm{h_2}\sigma_1\sigma_2 + \rm{h_3}\sigma_1\sigma_2 + \rm{h_4}\sigma_2^2) = \frac{1}{2!} \left(\sum_{i=1}^2 \frac{\partial}{\partial x_i} \sigma_i \right)^2 \it f} 
 \cr
-\bold{Second-order variance:} \eqn{\sigma_y^2 = {\color{red} \nabla_x\mathbf{C}_x\nabla_x^T} + {\color{blue} \frac{1}{2}\rm{tr}(\mathbf{H}_{xx}\mathbf{C}_x\mathbf{H}_{xx}\mathbf{C}_x)]}}:\cr
+\bold{Second-order variance:} \eqn{\sigma_y^2 = {\color{red} \nabla\mathbf{\Sigma}\nabla^T} + {\color{blue} \frac{1}{2}\rm{tr}(\mathbf{H\Sigma H\Sigma)}}}:\cr
 \deqn{{\color{blue}\frac{1}{2} \rm{tr} \left[ \begin{array}{cc} \rm{h_1} & \rm{h_2} \\ \rm{h_3} & \rm{h_4} \end{array} \right] \left[ \begin{array}{cc} \rm{\sigma_1^2} & \rm{\sigma_1\sigma_2} \\ \rm{\sigma_2\sigma_1} & \rm{\sigma_2^2} \end{array} \right] \left[ \begin{array}{cc} \rm{h_1} & \rm{h_2} \\ \rm{h_3} & \rm{h_4} \end{array} \right] \left[ \begin{array}{cc} \rm{\sigma_1^2} & \rm{\sigma_1\sigma_2} \\ \rm{\sigma_2\sigma_1} & \rm{\sigma_2^2} \end{array} \right]} = \ldots}
 \deqn{= \frac{1}{2} (\rm{h_1}^2\sigma_1^4 + \rm{2h_1h_2}\sigma_1^3\sigma_2 + \rm{2h_1h_3}\sigma_1^3\sigma_2 + \rm{h_2}^2\sigma_1^2\sigma_2^2 + \rm{2h_2h_3}\sigma_1^2\sigma_2^2 + \rm{h_3}^2\sigma_1^2\sigma_2^2 + \rm{2h_1h_4}\sigma_1^2\sigma_2^2}
 \deqn{+ \rm{2h_2h_4}\sigma_1\sigma_2^3 + \rm{2h_3h_4}\sigma_1\sigma_2^3 + \rm{h_4}^2\sigma_2^4 = \frac{1}{2} (\rm{h_1}\sigma_1^2 + \rm{h_2}\sigma_1\sigma_2 + \rm{h_3}\sigma_1\sigma_2 + \rm{h_4}\sigma_2^2)^2}
 \deqn{= \frac{1}{2!} \left( \left(\sum_{i=1}^2 \frac{\partial}{\partial x_i} \sigma_i \right)^2 \it f \right)^2}
 \cr
-with \eqn{\mathrm{E}(y)} = expectation of \eqn{y}, \eqn{\mathbf{\sigma_y^2}} = variance of \eqn{y}, \eqn{{\color{red} \nabla_x}} = the p x n gradient matrix with all partial first derivatives \eqn{{\color{red} \rm{j_i}}}, \eqn{\mathbf{C}_x} = the p x p covariance matrix, \eqn{{\color{blue}\mathbf{H}_{xx}}} the Hessian matrix with all partial second derivatives \eqn{{\color{blue} \rm{h_i}}}, \eqn{\sigma_i} = the uncertainties and \eqn{\rm{tr}(\cdot)} = the trace (sum of diagonal) of a matrix. Note that because the Hessian matrices are symmetric, \eqn{{\color{blue} \rm{h_2}} = {\color{blue} \rm{h_3}}}. For a detailed derivation, see 'References'.\cr
+with \eqn{\mathrm{E}(y)} = expectation of \eqn{y}, \eqn{\mathbf{\sigma_y^2}} = variance of \eqn{y}, \eqn{{\color{red} \nabla}} = the p x n gradient matrix with all partial first derivatives \eqn{{\color{red} \rm{j_i}}}, \eqn{\mathbf{\Sigma}} = the p x p covariance matrix, \eqn{{\color{blue}\mathbf{H}}} the Hessian matrix with all partial second derivatives \eqn{{\color{blue} \rm{h_i}}}, \eqn{\sigma_i} = the uncertainties and \eqn{\rm{tr}(\cdot)} = the trace (sum of diagonal) of a matrix. Note that because the Hessian matrices are symmetric, \eqn{{\color{blue} \rm{h_2}} = {\color{blue} \rm{h_3}}}. For a detailed derivation, see 'References'.\cr
 The second-order Taylor expansion corrects for bias in nonlinear expressions as the first-order Taylor expansion assumes linearity around \eqn{\bar{x}_i}. There is also a Python library available for second-order error propagation ('soerp', \url{https://pypi.python.org/pypi/soerp}). The 'propagate' package gives \bold{exactly} the same results, see last example under "Examples".\cr
-Depending on the input expression, the error propagation may result in an error that is not normally distributed. The Monte Carlo simulation, starting with a symmetric t-distributions of the variables, can clarify this. For instance, a high tendency from deviation of normality is encountered in formulas in which the error of the denominator is relatively large or in exponential models with a large error in the exponent.\cr 
+Depending on the input expression, the uncertainty propagation may result in an error that is not normally distributed. The Monte Carlo simulation, starting with a symmetric t-distributions of the variables, can clarify this. For instance, a high tendency from deviation of normality is encountered in formulas in which the error of the denominator is relatively large or in exponential models with a large error in the exponent.\cr 
 
 For setups in which there is no symbolic derivation possible (i.e. \code{e <- expression(abs(x))} => "Function 'abs' is not in the derivatives table") the function automatically switches from symbolic (using \code{\link{makeGrad}} or \code{\link{makeHess}}) to numeric (\code{\link{numGrad}} or \code{\link{numHess}}) differentiation.\cr
 
@@ -61,21 +61,21 @@ The function will try to evaluate the expression in an environment using \code{\
 2) When simulated data is supplied, a covariance matrix is constructed that either has (\code{cov = TRUE}) or has not (\code{cov = FALSE}) off-diagonal covariances.\cr
 3) The user can supply an own covariance matrix \eqn{\Sigma}, with the same column/row names as in \code{data}.
 
-The expanded uncertainty used for constructing the confidence interval is calculated from the Welch-Satterthwaite degrees of freedom \eqn{\nu_{\mathrm{exp}}} of the \code{\link{WelchSatter}} function.
+The expanded uncertainty used for constructing the confidence interval is calculated from the Welch-Satterthwaite degrees of freedom \eqn{\nu_{\mathrm{WS}}} of the \code{\link{WelchSatter}} function.
 }
 
 \value{
 A list with the following components:   
-\item{gradient}{the symbolic gradient vector \eqn{\nabla_x} of partial first-order derivatives.}
-\item{evalGrad}{the evaluated gradient vector \eqn{\nabla_x} of partial first-order derivatives, also known as the "sensitivity". See \code{\link{summary.propagate}}.}
-\item{hessian}{the symbolic Hessian matrix \eqn{\mathbf{H}_{xx}} of partial second-order derivatives.}
-\item{evalHess}{the evaluated Hessian matrix \eqn{\mathbf{H}_{xx}} of partial second-order derivatives.}
+\item{gradient}{the symbolic gradient vector \eqn{\nabla} of partial first-order derivatives.}
+\item{evalGrad}{the evaluated gradient vector \eqn{\nabla} of partial first-order derivatives, also known as the "sensitivity". See \code{\link{summary.propagate}}.}
+\item{hessian}{the symbolic Hessian matrix \eqn{\mathbf{H}} of partial second-order derivatives.}
+\item{evalHess}{the evaluated Hessian matrix \eqn{\mathbf{H}} of partial second-order derivatives.}
 \item{rel.contr}{the relative contribution matrix, see \code{\link{summary.propagate}}.}
-\item{covMat}{the covariance matrix \eqn{\mathbf{\Sigma}} used for Monte Carlo simulation and error propagation.} 
+\item{covMat}{the covariance matrix \eqn{\mathbf{\Sigma}} used for Monte Carlo simulation and uncertainty propagation.} 
 \item{ws.df}{the Welch-Satterthwaite degrees of freedom \eqn{\nu_{\mathrm{ws}}}, as obtained from \code{\link{WelchSatter}}.}
 \item{k}{the coverage factor \eqn{k}, as calculated by \eqn{t(1-(\alpha/2), \nu_{\mathrm{ws}})}.}
 \item{u.exp}{the expanded uncertainty, \eqn{k\sigma(y)}, where \eqn{\sigma(y)} is derived either from the second-order uncertainty, if successfully calculated, or first-order otherwise.}
-\item{resSIM}{a vector containing the \code{nsim} values obtained from the row-wise expression evaluations \eqn{\boldsymbol{f(x_{m, i})}} of the simulated data in \code{datSIM}.}
+\item{resSIM}{a vector containing the \code{nsim} values obtained from the row-wise expression evaluations \eqn{f(x_{m, i})} of the simulated data in \code{datSIM}.}
 \item{datSIM}{a vector containing the \code{nsim} simulated multivariate values for each variable in column format.}  
 \item{prop}{a summary vector containing first-/second-order expectations and uncertainties as well as the confidence interval based on \code{alpha}.} 
 \item{sim}{a summary vector containing the mean, standard deviation, median, MAD as well as the confidence interval based on \code{alpha}.}
@@ -177,7 +177,7 @@ RES2
 
 ## With the 'summary' function, we can get the
 ## Welch-Satterthwaite DF's, coverage, expanded uncertainty,
-## Gradient, Hessien etc.
+## Gradient and Hessian matrix etc.
 summary(RES2)
 
 ## Example using a recursive function:
@@ -270,9 +270,9 @@ RES6c <- propagate(expr = EXPR6c, data = DF6[, 1:2],
 
 ## This gives exactly the same values of mean and sd/sqrt(5)
 ## as given in Table H.4.
-RES6a$prop
-RES6b$prop
-RES6c$prop
+RES6a$prop # 0.15892/sqrt(5) = 0.071
+RES6b$prop # 0.66094/sqrt(5) = 0.296
+RES6c$prop # 0.52846/sqrt(5) = 0.236
 
 ######### GUM 2008 Supplement 1 (1) #######################
 ## Example from 9.2.2 of the GUM 2008 Supplement 1
@@ -339,15 +339,15 @@ RES9b
 ## Assignment of PDF's as in Table 10 of 9.5.2.1.
 EXPR10 <- expression(Ls + D + d1 + d2 - Ls *(da *(t0 + Delta) + as * dt) - Lnom)
 Lnom <- 50000000
-Ls <- propagate:::rst(100000, mean = 50000623, sd  = 25, df = 18)
-D <- propagate:::rst(100000, mean = 215, sd = 6, df = 25)
-d1 <- propagate:::rst(100000, mean = 0, sd = 4, df = 5)
-d2 <- propagate:::rst(100000, mean = 0, sd = 7, df = 8)
-as <- runif(100000, 9.5E-6, 13.5E-6)
-t0 <- rnorm(100000, -0.1, 0.2)
-Delta <- propagate:::rarcsin(100000, -0.5, 0.5)
-da <- propagate:::rctrap(100000, -1E-6, 1E-6, 0.1E-6)
-dt <- propagate:::rctrap(100000, -0.050, 0.050, 0.025)
+Ls <- propagate:::rst(1000000, mean = 50000623, sd  = 25, df = 18)
+D <- propagate:::rst(1000000, mean = 215, sd = 6, df = 25)
+d1 <- propagate:::rst(1000000, mean = 0, sd = 4, df = 5)
+d2 <- propagate:::rst(1000000, mean = 0, sd = 7, df = 8)
+as <- runif(1000000, 9.5E-6, 13.5E-6)
+t0 <- rnorm(1000000, -0.1, 0.2)
+Delta <- propagate:::rarcsin(1000000, -0.5, 0.5)
+da <- propagate:::rctrap(1000000, -1E-6, 1E-6, 0.1E-6)
+dt <- propagate:::rctrap(1000000, -0.050, 0.050, 0.025)
 DF10 <- cbind(Ls, D, d1, d2, as, t0, Delta, da, dt, Lnom)
 RES10 <- propagate(expr = EXPR10, data = DF10, cov = FALSE, alpha = 0.01)
 RES10

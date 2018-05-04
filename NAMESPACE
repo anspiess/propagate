@@ -36,7 +36,8 @@ importFrom("stats", BIC, coef, cor, cov, D, dcauchy,
            dnorm, dt, dunif, ks.test, mad, median, pnorm, 
            qbeta, qnorm, qt, quantile, rbinom, rchisq,
            residuals, rexp, rgamma, rnorm, rt, runif, sd,
-           shapiro.test, var, vcov, dbeta, dchisq, dexp, df, qqplot)
+           shapiro.test, var, vcov, dbeta, dchisq, dexp, df, qqplot, 
+           weights, formula, as.formula)
 importFrom("utils", flush.console, tail)
 
 import(Rcpp)

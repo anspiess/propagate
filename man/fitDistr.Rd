@@ -170,4 +170,3 @@ fitDistr(RES6, distsel = c(1:10, 15, 28))
 
 \keyword{algebra}
 \keyword{univariate}
-

@@ -63,7 +63,7 @@ verbose = TRUE,
     
     if (verbose) {
       timeNOW <- proc.time() - timeINIT
-      message("bigcor: ", timeNOW[3], "s\n")
+      message("bigcor: ", round(timeNOW[3], 2), " sec\n")
     }
     
     gc()

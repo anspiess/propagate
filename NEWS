@@ -6,13 +6,17 @@ propagate 1.0-6 (07-01-2018)
   1) Distribution selection is now based on BIC (not AIC), as my simulations revealed a more robust performance.
   2) We now have 32(!) distributions.
   3) All distributions are now fitted with a brute force approach so that the parameter space is exploited more efficiently.
-  4) The best fit is now explicitly named by a new 'print.fitDistr' function (requested by Hugo Mildenberger).
-  5) All density functions are now exported to be used elsewhere (requested by Hugo Mildenberger).
-  6) The fit quality can now be inspected with a QQ-Plot that compares the empirical data with the fitted distribution (requested by Hugo Mildenberger).
+  4) The best fit is now explicitly named by a new 'print.fitDistr' function (requested by H. Mildenberger).
+  5) All density functions are now exported to be used elsewhere (requested by H. Mildenberger).
+  6) The fit quality can now be inspected with a QQ-Plot that compares the empirical density with the theoretical density (requested by Hugo Mildenberger).
   7) All outputs are now sorted ascendingly by BIC.
   8) The parameter estimates are now supplemented by their standard errors.
   9) The distributions can now be selected by "distsel", e.g. c(1:10, 12, 15) (requested by Hugo Mildenberger).
   10) The BIC sorted output data frame now includes residual sum-of-squares (RSS) and mean squared error (MSE).
+* predictNLS has been overhauled by the following:
+  1) possible predictor errors are now to be supplied as a 'newerror =' dataframe.
+  2) calculated prediction intervals now handle the 'weights' argument of the fit (weighted residuals), as requested by T. Wenseleers.
+  3) The prediction intervals under 2) are created by augmenting the covariance matrix by the residual variance. Interestingly, if one supplies this augmented covariance matrix to 'rtmvt', that is we add another dimension with the residual variance of the fit, we get a 95% prediction interval when calculating the 2.5% / 97.5% quantiles. This approach is also added.
 
 propagate 1.0-5 (24-10-2017)
 Changes and bug-fixes in functions:

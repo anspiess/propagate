@@ -5,7 +5,7 @@ makeGrad <- function(expr, order = NULL)
   if (!is.null(order)) VARS <- VARS[order]
   FUN <- function(x) D(expr, x)
   vecGRAD <- sapply(VARS, FUN)
-  vecGRAD <- matrix(vecGRAD, nrow = 1)    
+  vecGRAD <- matrix(vecGRAD, nrow = 1)  
   return(vecGRAD)  
 } 
 

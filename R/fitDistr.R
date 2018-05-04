@@ -261,7 +261,8 @@ fitDistr <- function(
   ## version 1.0-6: plot best fit as qqplot
   if (plot == "qq") {
     TEXT <- paste(distNAMES[iter[SEL]], "distribution\n BIC =", round(BICS[SEL], 3))
-    qqplot(DENS$y, evalY, asp = 1, pch = 16, col = "dodgerblue3", xlab = "Density", ylab = "Fitted", main = TEXT, ...)
+    qqplot(DENS$y, evalY, asp = 1, pch = 16, col = "dodgerblue3", xlab = "Empirical density", 
+           ylab = "Theoretical density", main = TEXT, ...)
     grid()
     segments(-0.1, -0.1, 1.2 * max(evalY, na.rm = TRUE), 1.2 * max(evalY, na.rm = TRUE), col = "red3", lty = 1, lwd = 2, ...)
   }
@@ -273,4 +274,3 @@ fitDistr <- function(
   class(OUT) <- "fitDistr"
   return(OUT)
 }
-
