@@ -65,20 +65,25 @@ http://rmazing.wordpress.com/2013/08/26/predictnls-part-2-taylor-approximation-c
 }
 
 \examples{
+## In these examples, 'nsim = 100000' to save
+## Rcmd check time (CRAN). It is advocated
+## to use at least 'nsim = 1000000' though...
+
 ## Example from ?nls.
 DNase1 <- subset(DNase, Run == 1)
 fm3DNase1 <- nls(density ~ Asym/(1 + exp((xmid - log(conc))/scal)),
                  data = DNase1, start = list(Asym = 3, xmid = 0, scal = 1))
 
 ## Using a single predictor value without error.
-PROP1 <- predictNLS(fm3DNase1, newdata = data.frame(conc = 2))
-PRED1 <- predict(fm3DNase1, newdata = data.frame(conc = 2))
+PROP1 <- predictNLS(fm3DNase1, newdata = data.frame(conc = 2), nsim = 100000)
+PRED1 <- predict(fm3DNase1, newdata = data.frame(conc = 2), nsim = 100000)
 PROP1$summary
 PRED1
 ## => Prop.Mean.1 equal to PRED1
 
 ## Using a single predictor value with error.
-PROP2 <- predictNLS(fm3DNase1, newdata = data.frame(conc = 2), newerror = data.frame(conc = 0.5))
+PROP2 <- predictNLS(fm3DNase1, newdata = data.frame(conc = 2), 
+                    newerror = data.frame(conc = 0.5), nsim = 100000)
 PROP2$summary
 
 \dontrun{
@@ -119,18 +124,18 @@ z <- z + sapply(z, function(x) rnorm(1, x, 0.10 * x))
 MOD <- nls(z ~ a * exp(b * x)^sin(y/c), 
            start = list(a = 2, b = 5, c = 10))
 
-## 3: single newdata without errors.
+## 3: Single newdata without errors.
 DAT1 <- data.frame(x = 4, y = 3)
 PROP5 <- predictNLS(MOD, newdata = DAT1)
 PROP5$summary
 
-## 4: single newdata with errors.
+## 4: Single newdata with errors.
 DAT2 <- data.frame(x = 4, y = 3)
 ERR2 <- data.frame(x = 0.2, y = 0.1)
 PROP6 <- predictNLS(MOD, newdata = DAT2, newerror = ERR2)
 PROP6$summary
 
-## 5: multiple newdata with errors.
+## 5: Multiple newdata with errors.
 DAT3 <- data.frame(x = 1:4, y = 3)
 ERR3 <- data.frame(x = rep(0.2, 4), y = seq(1:4)/10)
 PROP7 <- predictNLS(MOD, newdata = DAT3, newerror = ERR3)
@@ -147,6 +152,17 @@ predict(LM, newdata = data.frame(X = 14.5), interval = "conf")
 predictNLS(NLS, newdata = data.frame(X = 14.5), interval = "conf")$summary
 predict(LM, newdata = data.frame(X = 14.5), interval = "pred")
 predictNLS(NLS, newdata = data.frame(X = 14.5), interval = "pred")$summary
+
+## 7: compare to 'predFit' function of 'investr' package.
+## Same results when using only first-order Taylor expansion.
+require(investr)
+data(Puromycin, package = "datasets")
+Puromycin2 <- Puromycin[Puromycin$state == "treated", ][, 1:2]
+Puro.nls <- nls(rate ~ Vm * conc/(K + conc), data = Puromycin2,
+                start = c(Vm = 200, K = 0.05))
+PRED1 <- predFit(Puro.nls, interval = "prediction")
+PRED2 <- predictNLS(Puro.nls, interval = "prediction", second.order = FALSE, do.sim = FALSE)
+all.equal(PRED1[, "lwr"], PRED2$summary[, 5]) # => TRUE
 } 
 }
 

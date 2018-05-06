@@ -73,7 +73,7 @@ summary.propagate <- function(object, ...)
     DAT <- object$resSIM[1:5000] else DAT <- object$resSIM 
     PVAL <- shapiro.test(DAT)$p.value
     cat(PVAL)
-    if (PVAL >= 0.05) cat(" => normal") else cat(" => non-normal")
+    if (PVAL >= 0.05) cat(" => normal\n") else cat(" => non-normal\n")
   }
     
   ## Kolmogorov-Smirnov test for normality of MC distribution
@@ -83,6 +83,6 @@ summary.propagate <- function(object, ...)
     simDAT <- rnorm(length(DAT), mean(DAT, na.rm = TRUE), sd(DAT, na.rm = TRUE))
     PVAL <- ks.test(DAT, simDAT)$p.value
     cat(PVAL)
-    if (PVAL >= 0.05) cat(" => normal") else cat(" => non-normal")  
+    if (PVAL >= 0.05) cat(" => normal\n") else cat(" => non-normal\n")  
   }
 }

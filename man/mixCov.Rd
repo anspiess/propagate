@@ -95,7 +95,7 @@ colnames(DAT) <- c("Rs", "Rx", "As", "ms", "mx")
 ## This will give exactly the same values as 
 ## in H.4.3/H.4.3.1.
 EXPR <- expression(As * (ms/mx) * (Rx/Rs))
-RES <- propagate(EXPR, data = DAT, cov = COV)
+RES <- propagate(EXPR, data = DAT, cov = COV, nsim = 100000)
 RES
 }   
 

@@ -156,13 +156,18 @@ Royston P.\cr
 }
 
 \examples{
+## In these examples, 'nsim = 100000' to save
+## Rcmd check time (CRAN). It is advocated
+## to use at least 'nsim = 1000000' though...
+
 ## Example without given degrees-of-freedom.
 EXPR1 <- expression(x/y)
 x <- c(5, 0.01)
 y <- c(1, 0.01)
 DF1 <- cbind(x, y)
 RES1 <- propagate(expr = EXPR1, data = DF1, type = "stat", 
-                  do.sim = TRUE, verbose = TRUE)
+                  do.sim = TRUE, verbose = TRUE, 
+                  nsim = 100000)
 RES1
 
 ## Same example with given degrees-of-freedom
@@ -172,7 +177,8 @@ x <- c(5, 0.01, 12)
 y <- c(1, 0.01, 5)
 DF2 <- cbind(x, y)
 RES2 <- propagate(expr = EXPR2, data = DF2, type = "stat", 
-                  do.sim = TRUE, verbose = TRUE)
+                  do.sim = TRUE, verbose = TRUE,
+                  nsim = 100000)
 RES2
 
 ## With the 'summary' function, we can get the

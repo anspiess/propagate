@@ -120,3 +120,6 @@ print.fitDistr <- function(x, ...)
   message("Goodness of fit:")
   cat("BIC =", x$stat[1, "BIC"])
 }
+
+isFALSE <- function (x) is.logical(x) && length(x) == 1L && !is.na(x) && !x
+isTRUE <- function (x) is.logical(x) && length(x) == 1L && !is.na(x) && x

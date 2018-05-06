@@ -41,7 +41,7 @@ x <- c(5, 0.01)
 y <- c(1, 0.01)
 DF1 <- cbind(x, y)
 RES1 <- propagate(expr = EXPR1, data = DF1, type = "stat", 
-                  do.sim = TRUE, verbose = TRUE)
+                  do.sim = TRUE, verbose = TRUE, nsim = 100000)
 summary(RES1)
 }
 

@@ -35,7 +35,7 @@ b <- c(100, 5)
 c <- c(0.5, 0.02)
 DAT <- cbind(a, b, c)
 EXPR <- expression(a * b^sin(c))
-RES <- propagate(EXPR, DAT)
+RES <- propagate(EXPR, DAT, nsim = 100000)
 stochContr(RES)
 }   
 

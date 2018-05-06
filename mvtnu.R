@@ -21,7 +21,7 @@ mvtvnu <- function (
   
   ## Step 1: map Pearson to Spearman correlations
   sigma2 <- sigma
-  #sigma2 <- 2 * sin(pi * sigma2 / 6)
+  sigma2 <- 2 * sin(pi * sigma2 / 6)
   diag(sigma2) <- 1
   
   ## STEP 2: sample from multivariate centered/scaled normal distribution
