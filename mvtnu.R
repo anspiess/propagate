@@ -21,7 +21,7 @@ mvtvnu <- function (
   
   ## Step 1: map Pearson to Spearman correlations
   sigma2 <- sigma
-  sigma2 <- 2 * sin(pi * sigma2 / 6)
+  #sigma2 <- 2 * sin(pi * sigma2 / 6)
   diag(sigma2) <- 1
   
   ## STEP 2: sample from multivariate centered/scaled normal distribution
@@ -36,6 +36,7 @@ mvtvnu <- function (
   Z <- sapply(1:len, function(i) qt.scaled(P[, i], df = nu[i], mean = mu[i], 
                                  sd = sqrt(diag(sigma)[i]), lower.tail = FALSE, log.p = FALSE))
   print(cor(Z), method = "spearman")
+  bla()
   #plot(Z[, 1], Z[, 2], pch = 16, col = "#33555533")
   
   ## optionally remove extreme points

@@ -22,12 +22,14 @@ predictNLS(model, newdata, newerror, interval = c("confidence", "prediction", "n
 }
 
 \details{
-Calculation of the propagated uncertainty \eqn{\sigma_y} using \eqn{\nabla \Sigma \nabla^T} is called the "Delta Method" and is widely applied in NLS fitting. However, this method is based on first-order Taylor expansion and thus assummes linearity around \eqn{f(x)}. The second-order approach as implemented in the \code{\link{propagate}} function can partially correct for this restriction by using a second-order polynomial around \eqn{f(x)}.\cr
-Confidence and prediction intervals are calculated in a usual way using \eqn{t(1 - \frac{\alpha}{2}, \nu) \cdot \sigma_y} (1) or \eqn{t(1 - \frac{\alpha}{2}, \nu) \cdot \sqrt{\sigma_y^2 + \textcolor{red}{\sigma_r^2}}} (2), respectively, where the residual variance \eqn{\textcolor{red}{\sigma_r^2} = \frac{\sum_{i=1}^n (y_i - \hat{y}_i)^2}{n - \nu}} (3).
-The inclusion of \eqn{\textcolor{red}{\sigma_r^2}} in the prediction interval is implemented as an extended gradient and "augmented" covariance matrix. So instead of using \eqn{y = f(x, \beta)} (4) we take \eqn{y = f(x, \beta) + \textcolor{red}{\sigma_r^2}} (5) as the expression and augment the \eqn{n \times n} covariance matrix \eqn{C} to an \eqn{n+1 \times n+1} covariance matrix, where \eqn{C_{n+1, n+1} = \textcolor{red}{\sigma_r^2}}. Partial differentiation and matrix multiplication will then yield, for example with two coefficients \eqn{\beta_1} and \eqn{\beta_2} and their corresponding covariance matrix \eqn{\Sigma}:     
-\deqn{\left[\frac{\partial f}{\partial \beta_1}\; \frac{\partial f}{\partial \beta_2}\; \textcolor{red}{1}\right] \left[ \begin{array}{ccc} \sigma_1^2 & \sigma_1\sigma_2 & 0 \\ \sigma_2\sigma_1 & \sigma_2^2 & 0 \\ 0 & 0 & \textcolor{red}{\sigma_r^2} \end{array} \right] \left[ \begin{array}{c} \frac{\partial f}{\partial \beta_1} \\ \frac{\partial f}{\partial \beta_2} \\ \textcolor{red}{1} \end{array} \right] = \left(\frac{\partial f}{\partial \beta_1}\right)^2\sigma_1^2 + 2 \frac{\partial f}{\partial \beta_1} \frac{\partial f}{\partial \beta_2} \sigma_1 \sigma_2 + \left(\frac{\partial f}{\partial \beta_2}\right)^2\sigma_2^2 + \textcolor{red}{\sigma_r^2}}
-\eqn{\equiv \sigma_y^2 + \textcolor{red}{\sigma_r^2}}, where \eqn{\sigma_y^2 + \textcolor{red}{\sigma_r^2}} then goes into (2).\cr
-The advantage of the augmented covariance matrix is that it can be exploited for creating Monte Carlo simulation-based prediction intervals. This is new from version 1.0-6 and is based on the paradigm that we simply add another dimension with \eqn{\mu = 0} and \eqn{\sigma^2 = \textcolor{red}{\sigma_r^2}} to the multivariate t-distribution random number generator (in our case \code{\link{rtmvt}}). All \eqn{n} simulations are then evaluated with (5) and the usual \eqn{[1 - \frac{\alpha}{2}, \frac{\alpha}{2}]} quantiles calculated.\cr 
+Calculation of the propagated uncertainty \eqn{\sigma_y} using \eqn{\nabla \Sigma \nabla^T} is called the "Delta Method" and is widely applied in NLS fitting. However, this method is based on first-order Taylor expansion and thus assummes linearity around \eqn{\hat{y} = f(x, \hat{\beta_i})}. The second-order approach as implemented in the \code{\link{propagate}} function can partially correct for this restriction by using a second-order polynomial around \eqn{\hat{y}}.\cr
+Confidence and prediction intervals are calculated in a usual way using \eqn{t(1 - \frac{\alpha}{2}, \nu) \cdot \sigma_y} (1) or \eqn{t(1 - \frac{\alpha}{2}, \nu) \cdot \sqrt{\sigma_y^2 + \textcolor{red}{\sigma_r^2}}} (2), respectively, where the residual variance \eqn{\textcolor{red}{\sigma_r^2} = \frac{\sum_{i=1}^n (y_i - \hat{y}_i)^2}{\nu}} (3).
+The inclusion of \eqn{\textcolor{red}{\sigma_r^2}} in the prediction interval is implemented as an extended gradient and "augmented" covariance matrix. So instead of using \eqn{\hat{y} = f(x, \hat{\beta})} (4), we take \eqn{\hat{y} = f(x, \hat{\beta}) + \textcolor{red}{\sigma_r^2}} (5) as the expression and augment the \eqn{i \times i} covariance matrix \eqn{\Sigma} to an \eqn{(i+1) \times (i+1)} covariance matrix, where \eqn{\Sigma_{i+1, i+1} = \textcolor{red}{\sigma_r^2}}. Partial differentiation and matrix multiplication will then yield, for example with two coefficients \eqn{\beta_1} and \eqn{\beta_2} and their corresponding covariance matrix \eqn{\Sigma}:     
+\deqn{\left[\frac{\partial f}{\partial \beta_1}\; \frac{\partial f}{\partial \beta_2}\; \textcolor{red}{1}\right] \left[ \begin{array}{ccc} \sigma_1^2 & \sigma_1\sigma_2 & 0 \\ \sigma_2\sigma_1 & \sigma_2^2 & 0 \\ 0 & 0 & \textcolor{red}{\sigma_r^2} \end{array} \right] \left[ \begin{array}{c} \frac{\partial f}{\partial \beta_1} \\ \frac{\partial f}{\partial \beta_2} \\ \textcolor{red}{1} \end{array} \right] \;\; (6)}
+\deqn{= \left(\frac{\partial f}{\partial \beta_1}\right)^2\sigma_1^2 + 2 \frac{\partial f}{\partial \beta_1} \frac{\partial f}{\partial \beta_2} \sigma_1 \sigma_2 + \left(\frac{\partial f}{\partial \beta_2}\right)^2\sigma_2^2 + \textcolor{red}{\sigma_r^2} \;\; (7)}
+\eqn{\equiv \sigma_y^2 + \textcolor{red}{\sigma_r^2}}, which then goes into (2).\cr
+The advantage of the augmented covariance matrix is that it can be exploited for creating Monte Carlo simulation-based prediction intervals. This is new from version 1.0-6 and is based on the paradigm that we simply add another dimension by employing the augmented covariance matrix of (6) in the multivariate t-distribution random number generator (in our case \code{\link{rtmvt}}), with \eqn{\mu = 0}. All \eqn{n} simulations are then evaluated with (5) and the usual \eqn{[1 - \frac{\alpha}{2}, \frac{\alpha}{2}]} quantiles calculated.\cr 
+
 If errors are supplied to the predictor values in \code{newerror}, they need to have the same column names and order than the new predictor values. 
 }
 
@@ -61,7 +63,8 @@ Tellinghuisen J.\cr
 
 From the author's blog:\cr
 http://rmazing.wordpress.com/2013/08/14/predictnls-part-1-monte-carlo-simulation-confidence-intervals-for-nls-models/\cr
-http://rmazing.wordpress.com/2013/08/26/predictnls-part-2-taylor-approximation-confidence-intervals-for-nls-models/
+http://rmazing.wordpress.com/2013/08/26/predictnls-part-2-taylor-approximation-confidence-intervals-for-nls-models/\cr
+https://rmazing.wordpress.com/2018/05/11/monte-carlo-based-prediction-intervals-for-nonlinear-regression/
 }
 
 \examples{
@@ -76,7 +79,7 @@ fm3DNase1 <- nls(density ~ Asym/(1 + exp((xmid - log(conc))/scal)),
 
 ## Using a single predictor value without error.
 PROP1 <- predictNLS(fm3DNase1, newdata = data.frame(conc = 2), nsim = 100000)
-PRED1 <- predict(fm3DNase1, newdata = data.frame(conc = 2), nsim = 100000)
+PRED1 <- predict(fm3DNase1, newdata = data.frame(conc = 2))
 PROP1$summary
 PRED1
 ## => Prop.Mean.1 equal to PRED1

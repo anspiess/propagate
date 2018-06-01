@@ -1,3 +1,7 @@
+propagate 1.0-6 (11-05-2018)
+* documentation to 'predictNLS' has been updated.
+
+
 propagate 1.0-6 (07-01-2018)
 * Doc to 'print.propagate' has been removed (too trivial...)
 * 'plot.propagate' has been changed to only display a histogram with confidence interval, median and mean; the former boxplot was not very expedient.
