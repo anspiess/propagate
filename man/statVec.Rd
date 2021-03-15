@@ -32,7 +32,7 @@ Andrej-Nikolai Spiess
 }   
 
 \examples{
-## Create a 10-sized vector with mean = 10 and s.d. = 1.
+## Create a 10-sized vector with mean = 5 and s.d. = 2.
 x <- rnorm(10, 5, 2)
 mean(x) ## => mean is not 5!
 sd(x) ## => s.d. is not 2!
